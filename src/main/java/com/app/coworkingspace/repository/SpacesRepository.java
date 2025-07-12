@@ -1,11 +1,57 @@
 package com.app.coworkingspace.repository;
 
 import com.app.coworkingspace.entity.Spaces;
-import org.springframework.data.jpa.repository.JpaRepository;
-import java.util.List;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.PersistenceContext;
+import org.springframework.stereotype.Repository;
 
-public interface SpacesRepository extends JpaRepository<Spaces, Integer> {
-    List<Spaces> findEmptyTables();
-    List<Spaces> findByUsername(String username);
-    long countByUsername(String username);
+import java.util.List;
+import java.util.Optional;
+
+
+@Repository
+public class SpacesRepository {
+
+    @PersistenceContext
+    private EntityManager em;
+
+    public void save(Spaces space) {
+        em.persist(space);
+    }
+
+    public void update(Spaces space) {
+        em.merge(space);
+    }
+
+    public void deleteById(int id) {
+        Spaces space = em.find(Spaces.class, id);
+        if (space != null) {
+            em.remove(space);
+        }
+    }
+
+    public Optional<Spaces> findById(int id) {
+        return Optional.ofNullable(em.find(Spaces.class, id));
+    }
+
+    public List<Spaces> findAll() {
+        return em.createQuery("SELECT s FROM Spaces s", Spaces.class).getResultList();
+    }
+
+    public List<Spaces> findAvailableSpaces() {
+        return em.createQuery("SELECT s FROM Spaces s WHERE s.reserved = false", Spaces.class).getResultList();
+    }
+
+    public List<Spaces> findByUsername(String username) {
+        return em.createQuery("SELECT s FROM Spaces s WHERE s.username = :username", Spaces.class)
+                .setParameter("username", username)
+                .getResultList();
+    }
+
+    public long countByUsername(String username) {
+        return em.createQuery("SELECT COUNT(s) FROM Spaces s WHERE s.username = :username", Long.class)
+                .setParameter("username", username)
+                .getSingleResult();
+    }
 }

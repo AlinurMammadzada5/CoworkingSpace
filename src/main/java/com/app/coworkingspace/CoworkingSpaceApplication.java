@@ -1,19 +1,17 @@
 package com.app.coworkingspace;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import com.app.coworkingspace.UI.Menu;
+import com.app.coworkingspace.config.SpringConfig;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-@SpringBootApplication(
-        exclude = {
-                org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration.class,
-                org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration.class,
-                org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration.class
-        }
-)
 public class CoworkingSpaceApplication {
-
     public static void main(String[] args) {
-        SpringApplication.run(CoworkingSpaceApplication.class, args);
-    }
+        AnnotationConfigApplicationContext context =
+                new AnnotationConfigApplicationContext(SpringConfig.class);
 
+        Menu menu = context.getBean(Menu.class);
+        menu.showMenu();
+
+        context.close();
+    }
 }
